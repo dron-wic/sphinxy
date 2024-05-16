@@ -6,14 +6,16 @@
 Welcome to proj-name_Sphinxy's documentation!
 =============================================
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   modules
+
+
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-.. toctree::
-   :maxdepth: 2
-
-   test_case_1/index
-   test_case_2/index

@@ -1,0 +1,41 @@
+Чтобы создать функцию в conf.py для Sphinx, которая будет формировать страницы для разных микроконтроллеров, вы должны будете работать с Sphinx API и возможно внести изменения в структуру вашего проекта. Ниже представлен пример функции, которая могла бы быть использована в conf.py для генерации документации для разных микроконтроллеров.
+
+Предположим, что у вас есть папки с именами микроконтроллеров, и в каждой из этих папок находится файл index.rst, который является корневым файлом для документации конкретного микроконтроллера.
+
+Copy
+Insert
+import os
+from sphinx.application import Sphinx
+
+def generate_microcontroller_docs(app: Sphinx):
+    microcontrollers = ['esp32', 'esp8266', 'atmega328']
+    for mcu in microcontrollers:
+        mcu_doc_path = os.path.join(app.srcdir, mcu)
+        
+        # Проверка существования директории
+        if not os.path.exists(mcu_doc_path):
+            os.makedirs(mcu_doc_path)
+        
+        # Создание или обновление index.rst файла
+        index_rst_path = os.path.join(mcu_doc_path, 'index.rst')
+        with open(index_rst_path, 'w') as index_file:
+            index_file.write(f"{mcu} Documentation\n")
+            index_file.write("=" * (len(mcu) + 13) + "\n\n")
+            index_file.write(f".. toctree::\n")
+            index_file.write(f"   :maxdepth: 2\n\n")
+            
+            # Добавление ссылок на файлы документации
+            for doc in os.listdir(mcu_doc_path):
+                if doc.endswith('.rst') and doc != 'index.rst':
+                    docname, _ = os.path.splitext(doc)
+                    index_file.write(f"   {docname}\n")
+
+def setup(app: Sphinx):
+    app.connect('builder-inited', generate_microcontroller_docs)
+Что делает код:
+
+Определяет список микроконтроллеров.
+Перебирает каждый микроконтроллер и создает отдельную папку для него в исходной директории документации, если она еще не создана.
+Создает или обновляет index.rst в папке каждого микроконтроллера, добавляя в него базовую структуру с использованием директивы toctree Sphinx, которая автоматически включает все .rst файлы в текущей папке в качестве подразделов.
+Регистрирует функцию generate_microcontroller_docs как обработчик события builder-inited.
+Чтобы использовать эту функцию, вам нужно включить ее в файл conf.py вашего проекта Sphinx. Когда вы запускаете сборку Sphinx, функция будет вызываться и создавать или обновлять index.rst файлы для каждого микроконтроллера перед началом сборки документации.
